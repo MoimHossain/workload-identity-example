@@ -37,7 +37,7 @@ jobs:
         with:
           scope: resourcegroup
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          resourceGroupName: ${{ AZURE_RESOURCE_GROUP }}
+          resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
           template: ./Infrastructure/main.bicep
           parameters: 'appName=${{ env.AZURE_WEBAPP_NAME }}' 
           
