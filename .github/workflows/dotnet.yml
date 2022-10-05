@@ -1,0 +1,45 @@
+name: Build and deploy WebApp 
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+      id-token: write
+      contents: read
+    
+env:
+  AZURE_WEBAPP_NAME: moimxysf34d    # set this to your application's name - test
+  AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
+  DOTNET_VERSION: '6.0.101'   
+
+
+jobs:
+  build:    
+    runs-on: ubuntu-latest
+
+    
+    steps:      
+      - uses: actions/checkout@v2
+      
+      - name: OIDC Login to Azure 
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }} 
+          enable-AzPSSession: false
+
+      - name: Deploy Azure Resource Manager (ARM) Template
+        uses: Azure/arm-deploy@main
+        with:
+          scope: resourcegroup
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          resourceGroupName: identity
+          template: ./Infrastructure/main.bicep
+          parameters: 'appName=moimxys234c' 
+          
+          
+      - name: Azure logout
+        run: az logout
