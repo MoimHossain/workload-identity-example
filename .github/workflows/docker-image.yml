@@ -1,0 +1,32 @@
+name: Azure Managed Identity Workload Federation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  azure-federation-job:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Azure CLI
+      uses: azure/setup-azure-cli@v1
+
+    - name: Login to Azure using Workload Identity Federation
+      run: |
+        az login --identity --tenant ${{ secrets.AZURE_TENANT_ID }}
+        az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Run Azure CLI commands
+      run: |
+        az account show
+        az resource list --out table
+
+    - name: Perform your Azure tasks
+      run: |
+        # Add your Azure CLI or any other Azure commands here
+        echo "Running your Azure tasks"
