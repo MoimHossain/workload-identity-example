@@ -32,35 +32,15 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }} 
           enable-AzPSSession: false
 
-      - name: Deploy Azure Resource Manager (ARM) Template
-        uses: Azure/arm-deploy@main
+
+      - name: Azure CLI Action
+        uses: Azure/cli@v2.1.0
         with:
-          scope: resourcegroup
-          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
-          template: ./Infrastructure/main.bicep
-          parameters: 'appName=${{ env.AZURE_WEBAPP_NAME }}' 
+          # Specify the script here
+          inlineScript: |
+             az group list -o table
+
           
-      # Setup .NET Core SDK
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }} 
-      
-      # Run dotnet build and publish
-      - name: dotnet build and publish
-        working-directory: DemoApp
-        run: |
-          dotnet restore
-          dotnet build --configuration Release
-          dotnet publish -c Release -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/DemoAppBinaries' 
-          
-      # Deploy to Azure Web apps
-      - name: 'Run Azure webapp deploy action using publish profile credentials'
-        uses: azure/webapps-deploy@v2        
-        with: 
-          app-name: ${{ env.AZURE_WEBAPP_NAME }} 
-          package: 'DemoApp/${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/DemoAppBinaries'
         
 
 
